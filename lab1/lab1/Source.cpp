@@ -4,7 +4,7 @@ using namespace std;
 
 void input(double** a, double* b, int n, double **a1, double **a2, double *b2)
 {
-	cout << "Введите матрицу: " << endl;
+	cout << "Р•nter matrix: " << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		a[i] = new double[n];
@@ -41,7 +41,7 @@ void input(double** a, double* b, int n, double **a1, double **a2, double *b2)
 
 void output(double** a, double* b, int n)
 {
-	cout << "Ваша матрица: " << endl;
+	cout << "Matrix: " << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		for (int j = 0; j < n; ++j)
@@ -131,9 +131,9 @@ void vector(double** a2, double* b2, int n, double* x)
 			maxp = abs(v[i]);
 		}
 	}
-	cout << "Норма вектора невязки: " << maxp << endl;
+	cout << "Vector norm: " << maxp << endl;
 
-	cout << "Вектор невязки: " << endl;
+	cout << "Vector: " << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		cout << v[i] << " ";
@@ -225,12 +225,11 @@ void relative_error(int n, double* x, double** a1, double *x1)
 			max1 = x[i];
 		}
 	}
-	cout << "Погрешность: " << max2 / max1 << endl;
+	cout << "Error: " << max2 / max1 << endl;
 }
 
 int main()
 {
-	setlocale(LC_ALL, "Russian");
 	int n = 3;
 	double* x, ** a, * b, **a1, *x1, **a2, *b2;
 	a = new double* [n];
