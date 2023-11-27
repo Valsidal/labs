@@ -4,7 +4,7 @@ using namespace std;
 
 void input(double** a, double* b, int n, double **a1, double **a2, double *b2)
 {
-	cout << "Р•nter matrix: " << endl;
+	cout << "Введите матрицу: " << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		a[i] = new double[n];
@@ -41,7 +41,7 @@ void input(double** a, double* b, int n, double **a1, double **a2, double *b2)
 
 void output(double** a, double* b, int n)
 {
-	cout << "Matrix: " << endl;
+	cout << "Ваша матрица: " << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		for (int j = 0; j < n; ++j)
@@ -52,7 +52,7 @@ void output(double** a, double* b, int n)
 	}
 }
 
-void gauss(double** a, double* b, int n, double* x)
+double *gauss(double** a, double* b, int n, double* x)
 {
 	double max;
 	int ind;
@@ -105,13 +105,7 @@ void gauss(double** a, double* b, int n, double* x)
 		for (int i = 0; i < k; ++i)
 			b[i] = b[i] - a[i][k] * x[k];
 	}
-
-	cout << "X: " << endl;
-	for (int i = 0; i < n; ++i)
-	{
-		cout << x[i] << " ";
-	}
-	cout << endl;
+	return x;
 }
 
 void vector(double** a2, double* b2, int n, double* x)
@@ -131,9 +125,9 @@ void vector(double** a2, double* b2, int n, double* x)
 			maxp = abs(v[i]);
 		}
 	}
-	cout << "Vector norm: " << maxp << endl;
+	cout << "Норма вектора невязки: " << maxp << endl;
 
-	cout << "Vector: " << endl;
+	cout << "Вектор невязки: " << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		cout << v[i] << " ";
@@ -141,69 +135,24 @@ void vector(double** a2, double* b2, int n, double* x)
 	cout << endl;
 }
 
-void relative_error(int n, double* x, double** a1, double *x1)
+void relative_error(int n, double* x, double** a, double *b, double *x1 )
 {
-
-	double max;
-	int ind;
-	int k = 0;
-	double *b1;
-	b1 = new double[n];
 	for (int i = 0; i < n; ++i)
 	{
-		b1[i] = 0;
+		b[i] = 0;
 		for (int j = 0; j < n; ++j)
 		{
-			b1[i] += a1[i][j] * x[j];
+			b[i] += a[i][j] * x[j];
 		}
 	}
-	for (k = 0; k < n; ++k)
+
+	for (int i = 0; i < n; ++i)
 	{
-		max = abs(a1[k][k]);
-		ind = k;
-
-		for (int i = k + 1; i < n; ++i)
-		{
-			if (abs(a1[i][k]) > max)
-			{
-				max = abs(a1[i][k]);
-				ind = i;
-			}
-		}
-
-		for (int j = 0; j < n; ++j)
-		{
-			double t = a1[k][j];
-			a1[k][j] = a1[ind][j];
-			a1[ind][j] = t;
-		}
-
-		double t = b1[k];
-		b1[k] = b1[ind];
-		b1[ind] = t;
-
-		for (int i = k; i < n; ++i)
-		{
-			double t = a1[i][k];
-			for (int j = 0; j < n; ++j)
-			{
-				a1[i][j] = a1[i][j] / t;
-			}
-			b1[i] = b1[i] / t;
-			if (i == k)  continue;
-			for (int j = 0; j < n; ++j)
-			{
-				a1[i][j] = a1[i][j] - a1[k][j];
-			}
-			b1[i] = b1[i] - b1[k];
-		}
+		cout << b[i] << " ";
 	}
-	for (k = n - 1; k >= 0; --k)
-	{
-		x1[k] = b1[k];
-		for (int i = 0; i < k; ++i)
-			b1[i] = b1[i] - a1[i][k] * b1[k];
-	}
+	cout << endl;
+
+	x1 = gauss(a, b, n, x);
 
 	cout << "X1: " << endl;
 	for (int i = 0; i < n; ++i)
@@ -225,11 +174,12 @@ void relative_error(int n, double* x, double** a1, double *x1)
 			max1 = x[i];
 		}
 	}
-	cout << "Error: " << max2 / max1 << endl;
+	cout << "Погрешность: " << max2 / max1 << endl;
 }
 
 int main()
 {
+	setlocale(LC_ALL, "Russian");
 	int n = 3;
 	double* x, ** a, * b, **a1, *x1, **a2, *b2;
 	a = new double* [n];
@@ -243,9 +193,14 @@ int main()
 	cout << endl;
 	output(a, b, n);
 	cout << endl;
-	gauss(a, b, n, x);
+	x = gauss(a, b, n, x);
+	cout << "X: " << endl;
+	for (int i = 0; i < n; ++i)
+	{
+		cout << x[i] << " ";
+	}
 	cout << endl;
 	vector(a2, b2, n, x);
 	cout << endl;
-	relative_error(n, x, a1, x1);
+	relative_error(n, x, a1, x1, b);
 }
