@@ -1,3 +1,5 @@
 ﻿  Source.cpp
-C:\Users\vlad_\Documents\lab5\lab5\Source.cpp(70,1): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
-  lab5.vcxproj -> C:\Users\vlad_\Documents\lab5\x64\Debug\lab5.exe
+C:\Users\vlad_\Desktop\lab5\lab5\Source.cpp(120,1): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
+C:\Users\vlad_\Desktop\lab5\lab5\Source.cpp(148,19): warning C4101: k: неиспользованная локальная переменная
+C:\Users\vlad_\Desktop\lab5\lab5\Source.cpp(148,16): warning C4101: h: неиспользованная локальная переменная
+  lab5.vcxproj -> C:\Users\vlad_\Desktop\lab5\x64\Debug\lab5.exe

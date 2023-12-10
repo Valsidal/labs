@@ -7,6 +7,10 @@ double f(double x)
     return (sqrt(1+2*pow(x, 3)));
 }
 
+double f2(double x, double y) 
+{
+    return (pow(x, 2)/(1 + pow(y, 2)));
+}
 double sInt(double a, double b, int n) 
 {
     double h = (b - a) / n;
@@ -60,11 +64,57 @@ double intS(double a, double b, double eps, int n)
     return Int1;
 }
 
+double ksInt(double N, double M, double a1, double b1, double c, double d) 
+{
+    double h, k;
+    const int n = 50;
+    double z[n][n], ax[n], ans;
+
+    h = (b1 - a1) / (N - 1);
+    k = (d - c) / (M - 1);
+
+    for (int i = 0; i < N; ++i) 
+    { 
+        for (int j = 0; j < M; ++j) 
+        {
+            z[i][j] = f2(a1 + i * h, c + j * k);
+        }
+    }
+    for (int i = 0; i < N; ++i) 
+    {
+        ax[i] = 0;
+        for (int j = 0; j < M; ++j) 
+        {
+            if (j == 0 or j == M - 1)
+                ax[i] += z[i][j];
+            else if (j % 2 == 0)
+                ax[i] += 2 * z[i][j]; 
+            else
+                ax[i] += 4 * z[i][j]; 
+        }
+        ax[i] *= (k / 3);
+    }
+    ans = 0;
+    for (int i = 0; i < N; ++i) 
+    {
+        if (i == 0 or i == N - 1)
+            ans += ax[i]; 
+        else if (i % 2 == 0)  
+            ans += 2 * ax[i];
+        else
+            ans += 4 * ax[i];
+    }
+    ans *= (h / 3);
+    return ans;
+}
+
 double f(double x);
+double f2(double x, double y);
 double sInt(double a, double b, int n);
 double tInt(double a, double b, int n);
 double intT(double a, double b, double eps, int n);
 double intS(double a, double b, double eps, int n);
+double ksInt(double N, double M, double a1, double b1, double c, double d);
 
 void main()
 {
@@ -72,28 +122,41 @@ void main()
     double eps = 0.00001, a = 1.2, b = 2.471, int2, int1, e;
     int n = 2;
     int m;
-    cout << "1. Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ð» Ð¿Ð¾ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ðµ Ñ‚Ñ€Ð°Ð¿ÐµÑ†Ð¸Ð¹" << endl;
-    cout << "2. Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ð» Ð¿Ð¾ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ðµ Ð¡Ð¸Ð¼Ð¿ÑÐ¾Ð½Ð°" << endl;
+    cout << "1. Èíòåãðàë ïî ôîðìóëå òðàïåöèé" << endl;
+    cout << "2. Èíòåãðàë ïî ôîðìóëå Ñèìïñîíà" << endl;
+    cout << "3. Èíòåãðàë ïî êóáàòîðíîé ôîðìóëå Ñèìïñîíà" << endl;
     cin >> m;
     cout << endl;
     if (m == 1)
     {
         int2 = intT(a, b, eps, n);
-        cout << "Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ð» Ð¿Ð¾ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ðµ Ñ‚Ñ€Ð°Ð¿ÐµÑ†Ð¸Ð¹: " << int2;
+        cout << "Èíòåãðàë ïî ôîðìóëå òðàïåöèé: " << int2;
         int1 = intT(a, b, eps, n * 2);
         e = (int1 - int2) * (pow(0.5, 2) - 1);
-        cout << endl << "ÐŸÐ¾Ð³Ñ€ÐµÑˆÐ½Ð¾ÑÑ‚ÑŒ: " << e;
+        cout << endl << "Ïîãðåøíîñòü: " << e;
     }
     if (m == 2)
     {
         int2 = intS(a, b, eps, n);
-        cout << "Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ð» Ð¿Ð¾ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ðµ Ð¡Ð¸Ð¼Ð¿ÑÐ¾Ð½Ð°: " << int2;
+        cout << "Èíòåãðàë ïî ôîðìóëå Ñèìïñîíà: " << int2;
         int1 = intS(a, b, eps, n * 2);
         e = (int1 - int2) * (pow(0.5, 4) - 1);
-        cout << endl << "ÐŸÐ¾Ð³Ñ€ÐµÑˆÐ½Ð¾ÑÑ‚ÑŒ: " << e;
+        cout << endl << "Ïîãðåøíîñòü: " << e;
     }
-    if (m != 2 && m != 1)
+    if (m == 3)
     {
-        cout << "ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ð²Ð²Ð¾Ð´";
+        double h, k, a1, b1, c, d;
+        int N, M;
+        cout << "Ââåäèòå N" << endl;
+        cin >> N;
+        cout << "Ââåäèòå M" << endl;
+        cin >> M;
+        a1 = 0, b1 = 4, c = 1, d = 2;
+        cout << "Èíòåãðàë ïî êóáàòîðíîé ôîðìóëå Ñèìïñîíà: " << ksInt(N, M, a1, b1, c, d);
     }
+    if (m != 2 && m != 1 && m != 3)
+    {
+        cout << "Íåâåðíûé ââîä";
+    }
+    
 }
