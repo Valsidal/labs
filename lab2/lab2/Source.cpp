@@ -129,7 +129,7 @@ void newton(double x1, double x2, double m = 0.0, double eps = 1e-9, int max_ite
             x[i] += dx[i];
         }
         cout << k << " " << maxF << " " << maxGap << endl;
-        if (maxF <= eps || maxGap <= eps)
+        if (maxF <= eps && maxGap <= eps)
         {
             cout << "Решение: " << x[0] << "; " << x[1] << endl;
             break;
