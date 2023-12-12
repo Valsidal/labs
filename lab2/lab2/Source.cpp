@@ -82,7 +82,7 @@ void newton(double x1, double x2, double m = 0.0, double eps = 1e-9, int max_ite
     vector<double> x = { x1,x2 };
     cout << "Начальное приближение: " << x1 << ", " << x2 << endl;
     cout << "ε1 = " << eps << "; ε2 = " << eps << "; max_iter = " << max_iter << endl;
-    cout << "итерация  1  2 " << endl;
+    cout << "Итерация  1  2 " << endl;
     int k;
     for (k = 0; k < max_iter; k++)
     {
