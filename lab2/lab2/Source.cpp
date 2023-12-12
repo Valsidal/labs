@@ -1,218 +1,165 @@
-#include <iostream>
-#include <math.h>
-#include<iomanip>
+﻿#include <iostream>
+#include <cmath>
+#include <vector>
+
 using namespace std;
 
-double f1(double x1, double x2);
-double f2(double x1, double x2);
-double f1d11(double x1, double x2, double dif);
-double f1d12(double x1, double x2, double dif);
-double f2d21(double x1, double x2, double dif);
-double f2d22(double x1, double x2, double dif);
-void resV(double* v1, double x1, double x2);
-double* gauss(double** m, double* y, const int n, float accur);
-void output(double** m, double* y, const int n);
-
-void main()
+void gauss(vector<vector<double>> A, vector<double> B, vector<double>& x)
 {
-    double x1 = 1, x2 = -1;
-    int k = 1, N = 100;
-    double accur = 1e-9, dif = 0.01;
     const int n = 2;
-    double* v1, * x, * d, * sol, * v2;
-    v1 = new double[n];
-    v2 = new double[n];
-    d = new double[n];
-    x = new double[n];
-    sol = new double[n];
-    sol[0] = x1;
-    sol[1] = x2;
-    double** a = new double* [n];
     for (int i = 0; i < n; i++)
-    { 
-        a[i] = new double[n];
-    }
-    double** a2 = new double* [n];
-    for (int i = 0; i < n; i++) 
     {
-        a2[i] = new double[n];
+        B[i] *= -1;
     }
-    do
+    for (int i = 0; i < n; i++)
     {
-        resV(v1, x1, x2); 
-        a[0][0] = f1d11(x1, x2, dif);
-        a[1][0] = f1d12(x1, x2, dif);
-        a[0][1] = f2d21(x1, x2, dif);
-        a[1][1] = f2d22(x1, x2, dif);
-        for (int i = 0; i < n; i++)
-        { 
-            for (int j = 0; j < n; j++)
-            {
-                a2[i][j] = a[i][j];
-            }
-        }
-        for (int i = 0; i < n; i++)
+        int maxRow = i;
+        for (int k = i + 1; k < n; k++)
         {
-            v2[i] = v1[i];
-        }
-        output(a2, v2, n);
-        d = gauss(a2, v1, n, accur); 
-        for (int i = 0; i < n; i++)
-            sol[i] += d[i]; 
-        for (int i = 0; i < n; i++)
-        {
-            cout << "delta" << i + 1 << " = " << d[i] << " " << endl;
-        }
-        double max1 = 0;
-        double max2 = 0;
-        for (int i = 0; i < n; i++)  
-        {
-            if (abs(v1[i]) > max1)
+            if (abs(A[k][i]) > abs(A[maxRow][i]))
             {
-                max1 = abs(v1[i]);
-            }
-            if (abs(sol[i]) < 1)
-            {
-                if (abs(d[i]) > max2)
-                    max2 = abs(d[i]);
-            }
-            if (abs(d[i] >= 1))
-            {
-                if (abs(d[i] / sol[i]) > max2)
-                    max2 = abs(d[i]);
+                maxRow = k;
             }
         }
+        swap(A[maxRow], A[i]);
+        swap(B[maxRow], B[i]);
 
-        d[0] = max1;
-        d[1] = max2;
-        cout << endl;
-        x1 = sol[0];
-        x2 = sol[1];
-        k++;
-        if (k >= N)
+        for (int k = i + 1; k < n; k++)
         {
+            double factor = A[k][i] / A[i][i];
+            for (int j = i; j < n; j++)
+            {
+                A[k][j] -= factor * A[i][j];
+            }
+            B[k] -= factor * B[i];
+        }
+    }
+    for (int i = 0; i < 2; i++)
+    {
+        x.push_back(B[i]);
+    }
+    for (int i = 1; i >= 0; i--)
+    {
+        for (int j = i + 1; j < 2; j++)
+        {
+            x[i] -= A[i][j] * x[j];
+        }
+        x[i] /= A[i][i];
+    }
+}
+
+vector<double> f(vector<double> x)
+{
+    vector<double> F;
+    F.push_back(cos(0.4 * x[1] + pow(x[0], 2)) + pow(x[1], 2) + pow(x[0], 2) - 1.6);
+    F.push_back(1.5 * pow(x[0], 2) - (pow(x[1], 2) / 0.36) - 1);
+    return F;
+}
+
+void jacobi(double x1, double x2, vector<vector<double>>& jac)
+{
+    jac[0][0] = -2 * x1 * sin(0.4 * x2 + pow(x1, 2)) + 2 * x1;
+    jac[0][1] = -0.4 * sin(0.4 * x2 + pow(x1, 2)) + 2 * x2;
+    jac[1][0] = 3 * x1;
+    jac[1][1] = -2 * x2 / 0.36;
+}
+
+void anotherJacobi(vector<double> x, vector<vector<double>>& jac, double m)
+{
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            vector<double> xPlus = x;
+            xPlus[j] += xPlus[j] * m;
+            jac[i][j] = (f(xPlus)[i] - f(x)[i]) / (x[j] * m);
+        }
+    }
+}
+
+void newton(double x1, double x2, double m = 0.0, double eps = 1e-9, int max_iter = 100)
+{
+    vector<double> x = { x1,x2 };
+    cout << "Начальное приближение: " << x1 << ", " << x2 << endl;
+    cout << "ε1 = " << eps << "; ε2 = " << eps << "; max_iter = " << max_iter << endl;
+    cout << "итерация  1  2 " << endl;
+    int k;
+    for (k = 0; k < max_iter; k++)
+    {
+        vector<vector<double>> jac = { {0,0},{0,0} };
+        vector<double> F = f(x);
+        vector<double> dx;
+        if (m > 0)
+        {
+            anotherJacobi(x, jac, m);
+        }
+        else
+        {
+            jacobi(x[0], x[1], jac);
+        }
+        gauss(jac, F, dx);
+        double maxF;
+        double maxGap = 0;
+        if (abs(F[0]) > abs(F[1]))
+        {
+            maxF = abs(F[0]);
+        }
+        else
+        {
+            maxF = abs(F[1]);
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            double gap;
+            if (abs(x[i] + dx[i]) < 1)
+            {
+                gap = abs(dx[i]);
+            }
+            else
+            {
+                gap = abs((dx[i]) / x[i] + dx[i]);
+            }
+            if (maxGap < gap)
+            {
+                maxGap = gap;
+            }
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            x[i] += dx[i];
+        }
+        cout << k << " " << maxF << " " << maxGap << endl;
+        if (maxF <= eps || maxGap <= eps)
+        {
+            cout << "Решение: " << x[0] << "; " << x[1] << endl;
             break;
         }
-
-    } 
-    while (d[0] > accur || d[1] > accur);
-
-    x1 = sol[0];
-    x2 = sol[1];
-    cout << "____________________________________________________________" << endl;
-    for (int i = 0; i < n; i++)
-    {
-        cout << sol[i] << endl;
     }
-    delete[] v1;
-    delete[] v2;
-    delete[] x;
-    delete[] d;
-    delete[] sol;
-    for (int i = 0; i < n; i++)
+    if (k == max_iter)
     {
-        delete[] a[i];
+        cout << "IER = 2";
     }
-    for (int i = 0; i < n; i++)
-    {
-        delete[] a2[i];
-    }
-    delete[] a;
-    delete[] a2;
 }
 
-double f1(double x1, double x2)
+int main()
 {
-    return (cos(0.4*x2+pow(x1,2)) + pow(x2, 2) + pow(x1, 2) - 1.6);
-}
-double f2(double x1, double x2)
-{
-    return (1.5*pow(x1,2)-(pow(x2,2)/0.36)-1);
-}
-double f1d11(double x1, double x2, double dif)
-{
-    cout << ((f1(x1 + dif, x2) - f1(x1, x2)) / (dif));
-    return((f1(x1 + dif, x2) - f1(x1, x2)) / (dif));
-}
-double f1d12(double x1, double x2, double dif)
-{
-    cout << ((f1(x1, x2 + dif) - f1(x1, x2)) / (dif));
-    return((f1(x1, x2 + dif) - f1(x1, x2)) / (dif));
-}
-double f2d21(double x1, double x2, double dif)
-{
-    cout << ((f2(x1 + dif, x2) - f2(x1, x2)) / (dif));
-    return((f2(x1 + dif, x2) - f2(x1, x2)) / (dif));
-}
-double f2d22(double x1, double x2, double dif)
-{
-    cout << ((f2(x1, x2 + dif) - f2(x1, x2)) / (dif));
-    return((f2(x1, x2 + dif) - f2(x1, x2)) / (dif));
-}
-
-void resV(double* vNev, double x1, double x2)
-{
-    vNev[0] = -f1(x1, x2);
-    vNev[1] = -f2(x1, x2);
-}
-void output(double** m, double* y, const int n)
-{
+    setlocale(LC_ALL, "RUS");
+    newton(1, -1);
     cout << endl;
-    cout << "matrix" << endl;
-    for (int i = 0; i < n; ++i)
-    {
-        for (int j = 0; j < n; ++j)
-        {
-            cout << m[i][j] << " ";
-        }
-        cout << y[i] << endl;
-    }
-}
-double* gauss(double** m, double* y, const int n, float accur)
-{
-    double* x, max, roundH;
-    int k, index;
-    const double eps = 0.00001;  
-    x = new double[n];
-    k = 0;
-    while (k < n)
-    {
-        max = abs(m[k][k]);
-        index = k;
-        for (int i = k + 1; i < n; i++)
-        {
-            if (abs(m[i][k]) > max)
-            {
-                max = abs(m[i][k]);
-                index = i;
-            }
-        }
-        for (int j = 0; j < n; j++)
-        {
-            swap(m[k][j], m[index][j]);
-        }
-        swap(y[k], y[index]);
-        for (int i = k; i < n; i++)
-        {
-            double temp = m[i][k];
-            if (abs(temp) < eps) continue; 
-            for (int j = 0; j < n; j++) 
-            {
-                m[i][j] = m[i][j] / temp;
-            }
-            y[i] = y[i] / temp;
-            if (i == k)  continue;
-            for (int j = 0; j < n; j++)
-                m[i][j] = m[i][j] - m[k][j];
-            y[i] = y[i] - y[k];
-        }
-        k++;
-    }
-    for (k = n - 1; k >= 0; k--)
-    {
-        x[k] = y[k];
-        for (int i = 0; i < k; i++)
-            y[i] = y[i] - m[i][k] * x[k];
-    }
-    return x;
+    newton(-1, 1);
+    cout << endl;
+    cout << "M = 0.01" << endl;
+    newton(1, -1, 0.01);
+    cout << endl;
+    newton(-1, 1, 0.01);
+    cout << endl;
+    cout << "M = 0.05" << endl;
+    newton(1, -1, 0.05);
+    cout << endl;
+    newton(-1, 1, 0.05);
+    cout << endl;
+    cout << "M = 0.1" << endl;
+    newton(1, -1, 0.1);
+    cout << endl;
+    newton(-1, 1, 0.1);
 }

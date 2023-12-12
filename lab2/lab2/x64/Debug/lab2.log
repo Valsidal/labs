@@ -1,5 +1,5 @@
 ﻿  Source.cpp
-C:\Users\vlad_\Documents\lab2\lab2\Source.cpp(17,1): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
-C:\Users\vlad_\Documents\lab2\lab2\Source.cpp(59,36): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-C:\Users\vlad_\Documents\lab2\lab2\Source.cpp(173,21): warning C4101: roundH: неиспользованная локальная переменная
-  lab2.vcxproj -> C:\Users\vlad_\Documents\lab2\x64\Debug\lab2.exe
+C:\Users\vlad_\Desktop\lab2\lab2\Source.cpp(84,13): warning C4566: символ, представленный универсальным именем символа "\u03B5", невозможно представить в текущей кодовой странице (1251)
+C:\Users\vlad_\Desktop\lab2\lab2\Source.cpp(84,32): warning C4566: символ, представленный универсальным именем символа "\u03B5", невозможно представить в текущей кодовой странице (1251)
+C:\Users\vlad_\Desktop\lab2\lab2\Source.cpp(85,13): warning C4566: символ, представленный универсальным именем символа "\uF064", невозможно представить в текущей кодовой странице (1251)
+  lab2.vcxproj -> C:\Users\vlad_\Desktop\lab2\x64\Debug\lab2.exe
